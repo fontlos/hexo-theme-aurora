@@ -59,7 +59,40 @@ export default ({ mode }) => {
         minify: true,
         entry: '/src/main.ts',
         filename: filenamePath,
-        template: templatePath
+        template: templatePath,
+        inject: {
+          tags: [
+            {
+              tag: 'title',
+              attrs: {
+                id: '__static_title',
+              },
+              children: '<%= page.title ? page.title + '|' + config.title : config.title %>',
+              injectTo: 'head-prepend',
+            },
+            {
+              tag: 'meta',
+              attrs: {
+                name: 'description',
+                content: '<%= page.abstracts || page.description || config.description %>',
+              },
+              injectTo: 'head-prepend',
+            },
+            {
+              tag: 'meta',
+              attrs: {
+                name: 'keywords',
+                content: '<%= (page.tags && page.tags.data) ? page.tags.data.map(tag => tag.name).join(\', \') : (page.keywords || config.keywords) %>',
+              },
+              injectTo: 'head-prepend',
+            },
+            {
+              tag: 'script',
+              children: 'document.getElementById(\'__static_title\').remove()',
+              injectTo: 'head-prepend',
+            },
+          ],
+        },
       }),
       vue(),
       Pages({})
